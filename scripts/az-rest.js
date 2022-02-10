@@ -11,6 +11,7 @@ var timeoutCounter = 1;
 function resetCounters(){
     totalCollectionCount = 0;
     totalCommitsCount = 0;
+    timeoutCounter = 1;
 }
 
 function getCommitCount(userId, password, duration){
@@ -25,7 +26,9 @@ function getCommitCount(userId, password, duration){
     var request = new XMLHttpRequest();
     request.open("GET", getRootUri() + "/_apis/projectCollections?$top=1000", true);
     request.setRequestHeader('Authorization', 'Basic ' + authorizationBasic);
-    request.send();
+
+    // Initially wait for few sec
+    setTimeout(() => {request.send(); }, 1500);
 
     request.onreadystatechange = function(){
         if (request.readyState === 4) {
@@ -48,7 +51,8 @@ function getRepositories(collectionName, minTime){
     var request = new XMLHttpRequest();
     request.open("GET", getRootUri() + "/" + collectionName + "//_apis/git/repositories?api-version=6.0", true);
     request.setRequestHeader('Authorization', 'Basic ' + authorizationBasic);
-    request.send();
+
+    setTimeout(() => {request.send(); }, (timeoutCounter++ % 5)*100);
 
     request.onreadystatechange = function () {
         if (request.readyState === 4) {
@@ -70,7 +74,7 @@ function getCommits(collectionName, repositoryId, minTime){
     request.open("GET", getRootUri() + "/" + collectionName + "//_apis/git/repositories/" + repositoryId + "/commits?api-version=6.0&searchCriteria.fromDate=" + minTime, true);
     request.setRequestHeader('Authorization', 'Basic ' + authorizationBasic);
 
-    setTimeout(() => {request.send(); }, (timeoutCounter++ % 60)*5);
+    setTimeout(() => {request.send(); }, (timeoutCounter++ % 60)*7 + 10);
 
     request.onreadystatechange = function () {
         if (request.readyState === 4) {
