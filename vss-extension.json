@@ -1,0 +1,116 @@
+{
+    "manifestVersion": 1,
+    "id": "dalui-tanmoy-GitCommitCounterWidget",
+    "version": "1.0.16",
+    "name": "Git Commit Counter",
+    "description": "Dashboard widget to get the count of Git Commits accross all Collections/Organizations",
+    "publisher": "tanmoydalui",
+    "galleryFlags": [
+            "Public"
+    ],
+    "tags": [
+        "statistics",
+        "total",
+        "repos"
+    ],
+    "categories": [
+        "Azure Boards",
+        "Azure Repos"
+    ],
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "icons": {
+        "default": "img/logo.png"
+    },
+    "branding": {
+        "color": "rgb(6, 109, 122)",
+        "theme": "dark"
+    },
+    "content": {
+        "details": {
+            "path": "overview.md"
+        },
+        "license": {
+            "path": "license-terms.md"
+        }
+    },
+    "contributions": [
+        {
+            "id": "GitCommitCounterWidget",
+            "type": "ms.vss-dashboards-web.widget",
+            "targets": [
+                "ms.vss-dashboards-web.widget-catalog",
+                "tanmoydalui.dalui-tanmoy-GitCommitCounterWidget.GitCommitCounterWidget.Configuration"
+            ],
+            "properties": {
+                "name": "Git Commit Counter",
+                "description": "Dashboard widget to get the count of Git Commits accross all Collection/Organization",
+                "catalogIconUrl": "img/logo.png",
+                "previewImageUrl": "img/logo.png",                            
+                "uri": "git-commit-counter.html",
+                "isNameConfigurable": true,
+                "supportedSizes": [
+                    {
+                        "rowSpan": 1,
+                        "columnSpan": 2
+                    }
+                ],
+                "supportedScopes": ["project_team"]
+            }
+        },
+        {
+            "id": "GitCommitCounterWidget.Configuration",
+            "type": "ms.vss-dashboards-web.widget-configuration",
+            "targets": [ "ms.vss-dashboards-web.widget-configuration" ],
+            "properties": {
+                "name": "GitCommitCounterWidget Configuration",
+                "description": "Configures GitCommitCounterWidget",
+                "uri": "git-commit-counter-configuration.html"
+            }
+        }
+    ],
+    "files": [
+        {
+            "path": "git-commit-counter.html", "addressable": true
+        },
+        {
+            "path": "overview.md", "addressable": true
+        },
+        {
+            "path": "license-terms.md", "addressable": true
+        },
+        {
+            "path": "git-commit-counter-configuration.html", "addressable": true
+        },
+        {
+            "path": "sdk/node_modules/vss-web-extension-sdk/lib", "addressable": true
+        },
+        {
+            "path": "scripts", "addressable": true
+        },
+        {
+            "path": "img", "addressable": true
+        },
+        {
+            "path": "screenshots", "addressable": true
+        },
+        {
+            "path": "css", "addressable": true
+        }
+    ],
+    "scopes":[
+        "vso.project",
+        "vso.code"
+    ],
+    "screenshots": [
+        {
+            "path": "screenshots/screenshot-1.JPG"
+        },
+        {
+            "path": "screenshots/screenshot-2.JPG"
+        }
+    ]
+}
