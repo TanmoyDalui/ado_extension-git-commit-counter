@@ -122,6 +122,7 @@ function displayChart(ChartServices, topCommits, commitMap, topRepo){
             }],
             "xAxis": { 
                 "labelsEnabled": false,
+                "max" : topCommits[0],
                 "labelValues": getLabels(topCommits, commitMap) //[commitMap.get(topCommits[0]), commitMap.get(topCommits[1]), commitMap.get(topCommits[2]), commitMap.get(topCommits[3]), commitMap.get(topCommits[4])] 
             },
             "specializedOptions": {
