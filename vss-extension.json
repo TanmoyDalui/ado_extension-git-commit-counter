@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "dalui-tanmoy-GitCommitCounterWidget",
-    "version": "1.0.22",
+    "version": "1.1.27",
     "name": "Git Commit Counter",
     "description": "Dashboard widget to get the count of Git Commits accross all Collections/Organizations",
     "publisher": "tanmoydalui",
@@ -54,7 +54,7 @@
                 "isNameConfigurable": true,
                 "supportedSizes": [
                     {
-                        "rowSpan": 1,
+                        "rowSpan": 2,
                         "columnSpan": 2
                     }
                 ],

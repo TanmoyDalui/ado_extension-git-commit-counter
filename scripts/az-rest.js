@@ -8,13 +8,26 @@ var totalCommitsCount = 0;
 
 var timeoutCounter = 1;
 
+var topCommits = [];
+var commitMap = new Map();
+
 function resetCounters(){
     totalCollectionCount = 0;
     totalCommitsCount = 0;
     timeoutCounter = 1;
+    topCommits = [];
 }
 
-function getCommitCount(userId, password, duration){
+function initializeArray(array, dataLength, data){
+    for(var i=0; i<dataLength; i++){
+        array.push(data);
+    }
+}
+
+function getCommitCount(ChartServices, userId, password, duration, topRepo){
+    //console.log("getCommitCount() is triggered.");
+    $("#gitCommitCount").text("0");
+
     clientId = userId;
     clientSecret = password;
     authorizationBasic = window.btoa(clientId + ':' + clientSecret);
@@ -23,6 +36,8 @@ function getCommitCount(userId, password, duration){
     var minTime = getPreviousDate(duration);
 
     resetCounters();
+    initializeArray(topCommits, topRepo, 0);
+
     var request = new XMLHttpRequest();
     request.open("GET", getRootUri() + "/_apis/projectCollections?$top=1000", true);
     request.setRequestHeader('Authorization', 'Basic ' + authorizationBasic);
@@ -39,7 +54,7 @@ function getCommitCount(userId, password, duration){
 
             responseObj.value.forEach(function (item, index) {
                 //console.log(item.name);
-                getRepositories(item.name, minTime);
+                getRepositories(ChartServices, item.name, minTime, topRepo);
             });
     
         }
@@ -47,7 +62,8 @@ function getCommitCount(userId, password, duration){
 }
 
 
-function getRepositories(collectionName, minTime){
+function getRepositories(ChartServices, collectionName, minTime, topRepo){
+    //console.log("getRepositories() is triggered.");
     var request = new XMLHttpRequest();
     request.open("GET", getRootUri() + "/" + collectionName + "//_apis/git/repositories?api-version=6.0", true);
     request.setRequestHeader('Authorization', 'Basic ' + authorizationBasic);
@@ -61,7 +77,7 @@ function getRepositories(collectionName, minTime){
 
             responseObj.value.forEach(function (item, index) {
                 //console.log(item.name);
-                getCommits(collectionName, item.id, minTime);
+                getCommits(ChartServices, collectionName, item.project.name, item.id, item.name, minTime, topRepo);
             });
             responseObj = null;
         }
@@ -69,12 +85,12 @@ function getRepositories(collectionName, minTime){
 }
 
 
-function getCommits(collectionName, repositoryId, minTime){
+function getCommits(ChartServices, collectionName, projectName, repositoryId, repositoryName, minTime, topRepo){
     var request = new XMLHttpRequest();
     request.open("GET", getRootUri() + "/" + collectionName + "//_apis/git/repositories/" + repositoryId + "/commits?api-version=6.0&searchCriteria.fromDate=" + minTime, true);
     request.setRequestHeader('Authorization', 'Basic ' + authorizationBasic);
 
-    setTimeout(() => {request.send(); }, (timeoutCounter++ % 60)*7 + 10);
+    setTimeout(() => {request.send(); }, ((timeoutCounter++ % 10)*7) + 10);
 
     request.onreadystatechange = function () {
         if (request.readyState === 4) {
@@ -85,9 +101,27 @@ function getCommits(collectionName, repositoryId, minTime){
             totalCommitsCount = totalCommitsCount + gitCommitCount;
             //console.log(collectionName + " :: " + repositoryId + " :: " + gitCommitCount + " :: " +  totalCommitsCount);
 
+            // add commit details to map
+            commitMap.set(gitCommitCount, collectionName + " -> " + projectName + " -> " + repositoryName);
+            commitMap = new Map([...commitMap.entries()].sort((a, b) => a.key - b.key).reverse());
 
-            if(parseInt($("#gitCommitCount").text()) < totalCommitsCount)
+            // add commit count to array
+            if(gitCommitCount > topCommits[topRepo-1]){
+                topCommits[topRepo-1] = gitCommitCount;
+                topCommits.sort((a, b) => a - b);
+                topCommits.reverse();
+            }
+
+
+            if(parseInt($("#gitCommitCount").text()) < totalCommitsCount){
                 $("#gitCommitCount").text(totalCommitsCount);
+
+                /*console.log(topCommits);
+                for(var i=0; i<5; i++){
+                    console.log(commitMap.get(topCommits[i]));
+                }*/
+                displayChart(ChartServices, topCommits, commitMap, topRepo);
+            }
         }
     };
 }

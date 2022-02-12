@@ -3,8 +3,8 @@ VSS.init({
     usePlatformStyles: true
 });
 
-VSS.require(["TFS/Dashboards/WidgetHelpers"], 
-    function (WidgetHelpers) {
+VSS.require(["TFS/Dashboards/WidgetHelpers", "Charts/Services"], 
+    function (WidgetHelpers, ChartServices) {
         WidgetHelpers.IncludeWidgetStyles();
 
         VSS.register("GitCommitCounterWidget", function () {    
@@ -13,6 +13,7 @@ VSS.require(["TFS/Dashboards/WidgetHelpers"],
             var userId;
             var password;
             var duration = 1;
+            var topRepo = 5;
             var statDuration;
             
             var getCount = function (widgetSettings) {
@@ -31,11 +32,13 @@ VSS.require(["TFS/Dashboards/WidgetHelpers"],
 
                     duration = settings.duration;
 
+                    topRepo = settings.topRepo;
+
                     statDuration = settings.statDuration;
                     $("#statDuration").text(statDuration);
                 }
 
-                getCommitCount(userId, password, duration);
+                getCommitCount(ChartServices, userId, password, duration, topRepo);
                 
                 return WidgetHelpers.WidgetStatusHelper.Success();
                 
@@ -68,6 +71,69 @@ VSS.require(["TFS/Dashboards/WidgetHelpers"],
         });
         VSS.notifyLoadSucceeded();
 });
+
+
+function getColumnColors(topCommits, commitMap){
+    var customColors = [];
+    for(i=0; i<topCommits.length; i++){
+        var d = 256/topCommits.length;
+        var customColor = {};
+        customColor["value"] = commitMap.get(topCommits[i]);
+        customColor["backgroundColor"] = "rgb(36, " + ((15 + i*d)%256) + "," + ((255 - i*d)%256) + ")";
+        customColors.push(customColor);
+    }
+    return customColors;
+}
+
+
+function getLabels(topCommits, commitMap){
+    var lables = [];
+    for(i=0; i<topCommits.length; i++){
+        lables.push(commitMap.get(topCommits[i]));
+    }
+    return lables;
+}
+
+
+function displayChart(ChartServices, topCommits, commitMap, topRepo){
+    //console.log("Inside displayChart()");
+    $("#chart-title").text("Top " + topRepo + " active repositories");
+    // Create the chart
+    ChartServices.ChartsService.getService().then(function(chartService){
+        var $container = $('#Chart-Container');
+        var chartOptions = { 
+            "title": "Top 5 active repositories",
+            "hostOptions": { 
+                "height": "160", 
+                "width": "300"
+            },
+            "colorCustomizationOptions": {
+                "customColors": getColumnColors(topCommits, commitMap) /*[
+                    {backgroundColor: "#047BFB", value: commitMap.get(topCommits[0])},
+                    {backgroundColor: "#049CFB", value: commitMap.get(topCommits[1])},
+                    {backgroundColor: "#04BDFB", value: commitMap.get(topCommits[2])},
+                    {backgroundColor: "#04DEFB", value: commitMap.get(topCommits[3])},
+                    {backgroundColor: "#04FFFB", value: commitMap.get(topCommits[4])}
+                ]*/
+            },
+            "chartType": "column",
+            "series": [{
+                "data": topCommits
+            }],
+            "xAxis": { 
+                "labelsEnabled": false,
+                "labelValues": getLabels(topCommits, commitMap) //[commitMap.get(topCommits[0]), commitMap.get(topCommits[1]), commitMap.get(topCommits[2]), commitMap.get(topCommits[3]), commitMap.get(topCommits[4])] 
+            },
+            "specializedOptions": {
+                "showLabels": "true",
+                "size": 220
+            } 
+        };
+        $container.html("");
+        chartService.createChart($container, chartOptions);
+    });
+}
+
 
 function showLoading(){
     var $container = $('#gitCommitCount');

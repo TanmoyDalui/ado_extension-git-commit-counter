@@ -2,6 +2,7 @@ var backgroundColor;
 var $userId;
 var $password;
 var durationDropdown;
+var topRepoDropdown;
 var statDuration = "During last 1 day(s)";
 
 VSS.init({                        
@@ -18,6 +19,7 @@ VSS.require("TFS/Dashboards/WidgetHelpers",
             $userId = $("#user-id");
             $password = $("#password");
             $durationDropdown = $("#duration-dropdown");
+            $topRepoDropdown = $("#top-repo-dropdown");
 
             return {
                 load: function (widgetSettings, widgetConfigurationContext) {
@@ -38,6 +40,9 @@ VSS.require("TFS/Dashboards/WidgetHelpers",
                         if (settings.duration){
                             $durationDropdown.val(settings.duration);
                         }
+                        if (settings.topRepo){
+                            $topRepoDropdown.val(settings.topRepo);
+                        }
                     }
 
                     $backgroundColor.on("change", function (){ 
@@ -56,6 +61,10 @@ VSS.require("TFS/Dashboards/WidgetHelpers",
                         fieldChangedEvent(WidgetHelpers, widgetConfigurationContext);
                     });
 
+                    $topRepoDropdown.on("change", function (){ 
+                        fieldChangedEvent(WidgetHelpers, widgetConfigurationContext);
+                    });
+
                     return WidgetHelpers.WidgetStatusHelper.Success();
                 },
                 onSave: function() {
@@ -64,6 +73,7 @@ VSS.require("TFS/Dashboards/WidgetHelpers",
                         userId: $userId.val(),
                         password: $password.val(),
                         duration: $durationDropdown.val(),
+                        topRepo: $topRepoDropdown.val(),
                         statDuration: statDuration
                     })};
                     return WidgetHelpers.WidgetConfigurationSave.Valid(customSettings); 
@@ -84,11 +94,13 @@ function fieldChangedEvent(WidgetHelpers, widgetConfigurationContext){
         userId: $userId.val(),
         password: $password.val(),
         duration: $durationDropdown.val(),
+        topRepo: $topRepoDropdown.val(),
         statDuration: statDuration
     })};
 
 
     if( $userId.val() && $password.val() ){
+        //console.log("notifyConfiguration() is triggered.");
         notifyConfiguration(WidgetHelpers, widgetConfigurationContext, customSettings);
     }
 }
