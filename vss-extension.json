@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "dalui-tanmoy-GitCommitCounterWidget",
-    "version": "1.1.27",
+    "version": "1.1.28",
     "name": "Git Commit Counter",
     "description": "Dashboard widget to get the count of Git Commits accross all Collections/Organizations",
     "publisher": "tanmoydalui",
@@ -9,9 +9,7 @@
             "Public"
     ],
     "tags": [
-        "statistics",
-        "total",
-        "repos"
+        "statistics", "total", "repos", "git", "commit", "counter", "top commit", "tanmoy", "dalui"
     ],
     "categories": [
         "Azure Boards",
